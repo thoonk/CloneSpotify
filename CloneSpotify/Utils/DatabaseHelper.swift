@@ -18,7 +18,7 @@ struct DatabaseHelper {
         return products.products
     }
     
-    func getUsers() async throws -> [User] {
+    func fetchUsers() async throws -> [User] {
         guard let url = URL(string: "https://dummyjson.com/users") else {
             throw URLError(.badURL)
         }
@@ -27,36 +27,4 @@ struct DatabaseHelper {
         let users = try JSONDecoder().decode(UsersArray.self, from: data)
         return users.users
     }
-}
-
-
-struct ProductArray: Decodable {
-    let products: [Product]
-    let total, skip, limit: Int
-}
-
-// MARK: - Product
-struct Product: Decodable {
-    let id: Int
-    let title, description: String
-    let price, discountPercentage, rating: Double
-    let stock: Int
-    let brand: String?
-    let images: [String]
-    let thumbnail: String
-}
-
-struct UsersArray: Decodable {
-    let users: [User]
-    let total, skip, limit: Int
-}
-
-// MARK: - User
-struct User: Decodable {
-    let id: Int
-    let firstName, lastName: String
-    let age: Int
-    let email, phone, username, password: String
-    let image: String
-    let height, weight: Double
 }
