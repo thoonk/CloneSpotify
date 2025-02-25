@@ -11,6 +11,12 @@ struct HomeView: View {
     
     @State private var currentUser: User? = nil
     @State private var selectedCategory: Category? = nil
+    @State private var products: [Product] = []
+    
+    private let columns = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
     
     var body: some View {
         ZStack {
@@ -19,11 +25,14 @@ struct HomeView: View {
             ScrollView(.vertical) {
                 LazyVStack(spacing: 1, pinnedViews: [.sectionHeaders]) {
                     Section {
-                        ForEach(0..<20) { _ in
-                            Rectangle()
-                                .fill(.red)
-                                .frame(width: 200, height: 200)
+                        VStack(spacing: 16) {
+                            recentSection
+                            
+                            if let product = products.first {
+                                newReleaseSection(product: product)
+                            }
                         }
+                        .padding(.horizontal, 16)
                     } header: {
                         header
                     }
@@ -38,11 +47,10 @@ struct HomeView: View {
         }
     }
     
-    
     private func getData() async {
         do {
-            currentUser = try await DatabaseHelper().getUsers().first
-//            products = try await DatabaseHelper().fetchProducts()
+            currentUser = try await DatabaseHelper().fetchUsers().first
+            products = try await Array(DatabaseHelper().fetchProducts().prefix(8))
         } catch {
             
         }
@@ -66,11 +74,13 @@ struct HomeView: View {
             ScrollView(.horizontal) {
                 HStack(spacing: 8) {
                     ForEach(Category.allCases, id: \.self) { category in
-                        
-                        CategoryCell(title: category.rawValue.capitalized, isSelected: category == selectedCategory)
-                            .onTapGesture {
-                                selectedCategory = category
-                            }
+                        CategoryCell(
+                            title: category.rawValue.capitalized,
+                            isSelected: category == selectedCategory
+                        )
+                        .onTapGesture {
+                            selectedCategory = category
+                        }
                     }
                 }
                 .padding(.horizontal, 16)
@@ -81,6 +91,33 @@ struct HomeView: View {
         .padding(.leading, 8)
         .frame(maxWidth: .infinity)
         .background(.spotifyBlack)
+    }
+    
+    private var recentSection: some View {
+        LazyVGrid(columns: columns, alignment: .center, spacing: 10) {
+            ForEach(products) { product in
+                RecentsCell(
+                    imageName: product.firstImage,
+                    title: product.title
+                )
+            }
+        }
+    }
+    
+    private func newReleaseSection(product: Product) -> some View {
+        NewReleaseCell(
+            imageName: product.firstImage,
+            headline: product.brand,
+            subheadline: product.category,
+            title: product.title,
+            subtitle: product.description,
+            onAddToPlaylistPressed: {
+                
+            },
+            onPlayPressed: {
+                
+            }
+        )
     }
 }
 
