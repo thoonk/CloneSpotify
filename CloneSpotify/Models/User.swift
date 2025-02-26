@@ -20,4 +20,20 @@ struct User: Decodable {
     let email, phone, username, password: String
     let image: String
     let height, weight: Double
+    
+    static var mock: User {
+        .init(
+            id: 321,
+            firstName: "Thoonk",
+            lastName: "Kim",
+            age: 23,
+            email: "asdf@asdf.com",
+            phone: "",
+            username: "",
+            password: "",
+            image: Constants.randomImage,
+            height: 180,
+            weight: 200
+        )
+    }
 }
