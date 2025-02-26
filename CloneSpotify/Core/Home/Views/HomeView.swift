@@ -111,6 +111,9 @@ struct HomeView: View {
                     imageName: product.firstImage,
                     title: product.title
                 )
+                .withPressableAnimation {
+                    
+                }
             }
         }
     }
@@ -133,6 +136,9 @@ struct HomeView: View {
                                 imageName: product.firstImage,
                                 title: product.title
                             )
+                            .withPressableAnimation {
+                                
+                            }
                         }
                     }
                     .padding(.horizontal, 16)
