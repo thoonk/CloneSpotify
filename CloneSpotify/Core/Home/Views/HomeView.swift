@@ -12,6 +12,7 @@ struct HomeView: View {
     @State private var currentUser: User? = nil
     @State private var selectedCategory: Category? = nil
     @State private var products: [Product] = []
+    @State private var productRows: [ProductRow] = []
     
     private let columns = [
         GridItem(.flexible()),
@@ -31,8 +32,9 @@ struct HomeView: View {
                             if let product = products.first {
                                 newReleaseSection(product: product)
                             }
+                            
+                            brandSection
                         }
-                        .padding(.horizontal, 16)
                     } header: {
                         header
                     }
@@ -51,6 +53,15 @@ struct HomeView: View {
         do {
             currentUser = try await DatabaseHelper().fetchUsers().first
             products = try await Array(DatabaseHelper().fetchProducts().prefix(8))
+            
+            var rows: [ProductRow] = []
+            let allBrands = Set(products.compactMap { $0.brand })
+            for brand in allBrands {
+//                let filteredProducts = products.filter { $0.brand == brand }
+                rows.append(ProductRow(title: brand, products: products))
+            }
+            
+            productRows = rows
         } catch {
             
         }
@@ -100,6 +111,33 @@ struct HomeView: View {
                     imageName: product.firstImage,
                     title: product.title
                 )
+            }
+        }
+    }
+    
+    private var brandSection: some View {
+        ForEach(productRows) { row in
+            VStack(spacing: 8) {
+                Text(row.title)
+                    .font(.title)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.spotifyWhite)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                
+                ScrollView(.horizontal) {
+                    HStack {
+                        ForEach(row.products) { product in
+                            ImageTitleRowCell(
+                                imageSize: 120,
+                                imageName: product.firstImage,
+                                title: product.title
+                            )
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                }
+                .scrollIndicators(.hidden)
             }
         }
     }
