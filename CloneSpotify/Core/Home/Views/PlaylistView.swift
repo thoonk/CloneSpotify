@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PlaylistView: View {
     
+    @EnvironmentObject var router: Router
     var product: Product = .mock
     var user: User = .mock
     
@@ -51,7 +52,7 @@ struct PlaylistView: View {
                             title: product.title,
                             subtitle: product.brand,
                             onCellPressed: {
-                                
+                                router.navigateTo(.playlist(product, user))
                             },
                             onEllipsisPressed: {
                                 
@@ -63,35 +64,39 @@ struct PlaylistView: View {
             }
             .scrollIndicators(.hidden)
             
-            ZStack {
-                Text(product.title)
-                    .font(.headline)
-                    .foregroundStyle(.spotifyWhite)
-                    .padding(.vertical, 20)
-                    .frame(maxWidth: .infinity)
-                    .background(.spotifyBlack)
-                    .offset(y: showHeader ? 0 : -40)
-                    .opacity(showHeader ? 1 : 0)
-                
-                Image(systemName: "chevron.left")
-                    .font(.title3)
-                    .padding(10)
-                    .background(showHeader ? .black.opacity(0.0011) : .spotifyGray.opacity(0.7))
-                    .clipShape(Circle())
-                    .onTapGesture {
-                        
-                    }
-                    .padding(.leading, 16)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .foregroundStyle(.spotifyWhite)
-            .animation(.smooth(duration: 0.2), value: showHeader)
+            header
             .frame(maxHeight: .infinity, alignment: .top)
         }
         .task {
             await getData()
         }
         .toolbar(.hidden, for: .navigationBar)
+    }
+    
+    private var header: some View {
+        ZStack {
+            Text(product.title)
+                .font(.headline)
+                .foregroundStyle(.spotifyWhite)
+                .padding(.vertical, 20)
+                .frame(maxWidth: .infinity)
+                .background(.spotifyBlack)
+                .offset(y: showHeader ? 0 : -40)
+                .opacity(showHeader ? 1 : 0)
+            
+            Image(systemName: "chevron.left")
+                .font(.title3)
+                .padding(10)
+                .background(showHeader ? .black.opacity(0.0011) : .spotifyGray.opacity(0.7))
+                .clipShape(Circle())
+                .onTapGesture {
+                    router.navigateBack()
+                }
+                .padding(.leading, 16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .foregroundStyle(.spotifyWhite)
+        .animation(.smooth(duration: 0.2), value: showHeader)
     }
     
     private func getData() async {
@@ -104,5 +109,7 @@ struct PlaylistView: View {
 }
 
 #Preview {
-    PlaylistView()
+    RouterView {
+        PlaylistView()
+    }
 }

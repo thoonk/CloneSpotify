@@ -35,7 +35,6 @@ struct SongRowCell: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
-            
             Image(systemName: "ellipsis")
                 .font(.subheadline)
                 .foregroundStyle(.spotifyWhite)
@@ -44,6 +43,9 @@ struct SongRowCell: View {
                 .onTapGesture {
                     onEllipsisPressed?()
                 }
+        }
+        .onTapGesture {
+            onCellPressed?()
         }
     }
 }

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     
+    @EnvironmentObject var router: Router
     @State private var currentUser: User? = nil
     @State private var selectedCategory: Category? = nil
     @State private var products: [Product] = []
@@ -46,24 +47,6 @@ struct HomeView: View {
         }
         .task {
             await getData()
-        }
-    }
-    
-    private func getData() async {
-        do {
-            currentUser = try await DatabaseHelper().fetchUsers().first
-            products = try await Array(DatabaseHelper().fetchProducts().prefix(8))
-            
-            var rows: [ProductRow] = []
-            let allBrands = Set(products.compactMap { $0.brand })
-            for brand in allBrands {
-//                let filteredProducts = products.filter { $0.brand == brand }
-                rows.append(ProductRow(title: brand, products: products))
-            }
-            
-            productRows = rows
-        } catch {
-            
         }
     }
     
@@ -112,7 +95,7 @@ struct HomeView: View {
                     title: product.title
                 )
                 .withPressableAnimation {
-                    
+                    router.navigateTo(.playlist(product, currentUser ?? .mock))
                 }
             }
         }
@@ -137,7 +120,7 @@ struct HomeView: View {
                                 title: product.title
                             )
                             .withPressableAnimation {
-                                
+                                router.navigateTo(.playlist(product, currentUser ?? .mock))
                             }
                         }
                     }
@@ -155,16 +138,36 @@ struct HomeView: View {
             subheadline: product.category,
             title: product.title,
             subtitle: product.description,
-            onAddToPlaylistPressed: {
-                
-            },
+            onAddToPlaylistPressed: {},
             onPlayPressed: {
-                
+                router.navigateTo(.playlist(product, currentUser ?? .mock))
             }
         )
+    }
+    
+    private func getData() async {
+        guard products.isEmpty else { return }
+        
+        do {
+            currentUser = try await DatabaseHelper().fetchUsers().first
+            products = try await Array(DatabaseHelper().fetchProducts().prefix(8))
+            
+            var rows: [ProductRow] = []
+            let allBrands = Set(products.compactMap { $0.brand })
+            for brand in allBrands {
+//                let filteredProducts = products.filter { $0.brand == brand }
+                rows.append(ProductRow(title: brand, products: products))
+            }
+            
+            productRows = rows
+        } catch {
+            
+        }
     }
 }
 
 #Preview {
-    HomeView()
+    RouterView {
+        HomeView()
+    }
 }
