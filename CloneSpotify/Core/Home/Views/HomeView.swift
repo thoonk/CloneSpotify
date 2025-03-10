@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+@Observable
+final class HomeViewModel {
+    
+}
+
 struct HomeView: View {
     
     @EnvironmentObject var router: Router
@@ -94,7 +99,7 @@ struct HomeView: View {
                     imageName: product.firstImage,
                     title: product.title
                 )
-                .withPressableAnimation {
+                .interactiveButton(.press) {
                     router.navigateTo(.playlist(product, currentUser ?? .mock))
                 }
             }
@@ -119,7 +124,7 @@ struct HomeView: View {
                                 imageName: product.firstImage,
                                 title: product.title
                             )
-                            .withPressableAnimation {
+                            .interactiveButton(.press) {
                                 router.navigateTo(.playlist(product, currentUser ?? .mock))
                             }
                         }

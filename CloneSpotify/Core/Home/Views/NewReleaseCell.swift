@@ -82,6 +82,7 @@ struct NewReleaseCell: View {
                     }
                 }
                 .padding(.trailing, 16)
+                .padding(.vertical, 10)
             }
             .themeColors(isSelected: false)
             .cornerRadius(8)
